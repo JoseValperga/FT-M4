@@ -75,7 +75,6 @@ app.post("/login", (req, res) => {
   // 1) Obtener el email y password desde el body del request
 
   const { email, password } = req.body;
-  console.log(email, password);
   // 2) Verificar que ambos datos hayan sido provistos
   // Si ambos datos fueron provistos:
   //   a) Obtener del listado de usuarios (si existe) el que tenga dicho email y contraseña
@@ -94,7 +93,6 @@ app.post("/login", (req, res) => {
 
 app.get("/home", (req, res) => {
   const userId = parseInt(req.cookies.userId);
-  console.log("userId ", userId);
   const user = users.find((user) => user.id === userId); //Completar: obtener el usuario correspondiente del array 'users' tomando como
   //            referencia el id de usuario almacenado en la cookie
   console.log("User ", user);
@@ -103,6 +101,39 @@ app.get("/home", (req, res) => {
     <h4>${user.email}</h4>
     <a href='/'>Inicio</a>
   `);
+});
+
+app.post("/register", (req, res) => {
+  // 1) Obtener el name, email y password desde el body del request
+  const { name, email, password } = req.body;
+  // 2) Verificar que los tres datos hayan sido provistos
+  // Si todos los datos fueron provistos:
+  //   a) Buscar dentro del listado de usuarios si existe alguno que tenga dicho email para evitar
+  //      que existan dos usuarios con mismo mail
+  //   b) Crear un nuevo objeto con los datos del usuario y pushearlo al array de users
+  //   c) Redirigir a la pantalla inicial '/'
+  if (name && email && password) {
+    const user = users.find((user) => user.email === email);
+    if (!user) {
+      const newUserId = users[users.length - 1].id + 1;
+      const newUser = {
+        id: newUserId,
+        name: name,
+        email: email,
+        password: password,
+      };
+      users.push(newUser);
+      return res.redirect("/");
+    }
+  }
+  // En el caso de que ya exista un usuario con ese email o no se hayan provisto o
+  // el name o el email o la password, redirigir a /register
+  return res.redirect("/register");
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("userId");
+  res.redirect("/");
 });
 
 app.listen(3000, (err) => {
