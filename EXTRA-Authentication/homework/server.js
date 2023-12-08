@@ -21,9 +21,16 @@ app.use((req, res, next) => {
 
 const isAuthenticated = (req, res, next) => {
   // Si NO hay un usuario logueado redirigir a /login de lo contrario llamar a next()
-  console.log('UserId ', req.cookies.userId)
   if (!req.cookies.userId) {
     return res.redirect('/login')
+  }
+  next()
+}
+
+const isNotAuthenticated = (req, res, next) => {
+  // Si hay un usuario logueado redirigir a /home de lo contrario llamar a next()
+  if (req.cookies.userId) {
+    return res.redirect('/home')
   }
   next()
 }
