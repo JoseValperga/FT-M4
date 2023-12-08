@@ -19,13 +19,14 @@ app.use((req, res, next) => {
   next();
 });
 
-/*
-app.get('/', (req, res) => {
-  res.send(`
-    <h1>Bienvenidos a Henry!</h1>
-  `)
-});
-*/
+const isAuthenticated = (req, res, next) => {
+  // Si NO hay un usuario logueado redirigir a /login de lo contrario llamar a next()
+  console.log('UserId ', req.cookies.userId)
+  if (!req.cookies.userId) {
+    return res.redirect('/login')
+  }
+  next()
+}
 
 app.get("/", (req, res) => {
   res.send(`
@@ -91,7 +92,7 @@ app.post("/login", (req, res) => {
   return res.redirect("/login");
 });
 
-app.get("/home", (req, res) => {
+app.get("/home", isAuthenticated, (req, res) => {
   const userId = parseInt(req.cookies.userId);
   const user = users.find((user) => user.id === userId); //Completar: obtener el usuario correspondiente del array 'users' tomando como
   //            referencia el id de usuario almacenado en la cookie
